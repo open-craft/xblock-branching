@@ -39,28 +39,29 @@ def package_data(pkg, root_list):
     return {pkg: data}
 
 
-BLOCKS = [
-    'adventure = adventure.adventure:AdventureBlock',
-]
-
-BLOCKS_CHILDREN = [
-    'info = adventure.info:InfoBlock',
-    'step = adventure.step:StepBlock'
-]
-
 setup(
     name='xblock-adventure',
     version='1.0.1',
-    description='XBlock - Adventure',
+    description='XBlock - Adventure (Modernized for Redwood)',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     packages=['adventure'],
     install_requires=[
-        'XBlock',
-        'xblock-mentoring',
+        'XBlock>=1.6',
+        'Django>=4.2,<5.0',
+        'xblock-problem-builder',
     ],
-    dependency_links = ['http://github.com/openedx-unsupported/xblock-mentoring/tarball/master#egg=xblock-mentoring'],
     entry_points={
-        'xblock.v1': BLOCKS,
-        'xblock.light_children': BLOCKS_CHILDREN,
+        'xblock.v1': [
+            'adventure = adventure.adventure:AdventureBlock',
+            'adventure-info = adventure.info:InfoBlock',
+            'adventure-step = adventure.step:StepBlock'
+        ],
     },
     package_data=package_data("adventure", ["templates", "public"]),
+    classifiers=[
+        'Framework :: Django',
+        'Framework :: Django :: 4.2',
+        'Programming Language :: Python :: 3.11',
+    ],
 )
