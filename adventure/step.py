@@ -25,7 +25,7 @@
 
 import logging
 
-from ooyala_player.ooyala_player import OoyalaPlayerLightChildBlock
+# from ooyala_player.ooyala_player import OoyalaPlayerLightChildBlock
 
 from mentoring.light_children import LightChild, Scope, String
 from mentoring.mcq import MCQBlock
@@ -76,26 +76,26 @@ class StepBlock(LightChild, StepParentMixin):
 
         return bool(choices)
 
-    @property
-    def ooyala_players(self):
-        """
-        Returns the ooyala players child.
-        """
+    # @property
+    # def ooyala_players(self):
+    #     """
+    #     Returns the ooyala players child.
+    #     """
 
-        ooyala_players = [child for child in self.get_children_objects()
-                          if isinstance(child, OoyalaPlayerLightChildBlock)]
+    #     ooyala_players = [child for child in self.get_children_objects()
+    #                       if isinstance(child, OoyalaPlayerLightChildBlock)]
 
-        return ooyala_players
+    #     return ooyala_players
 
-    def get_step_fragment_children(self, context=None):
-        children = []
+    # def get_step_fragment_children(self, context=None):
+    #     children = []
 
-        ooyala_children = {}
-        for child in self.get_children_objects():
-            ooyala_children[child.name] = bool(isinstance(child, OoyalaPlayerLightChildBlock))
+    #     ooyala_children = {}
+    #     for child in self.get_children_objects():
+    #         ooyala_children[child.name] = bool(isinstance(child, OoyalaPlayerLightChildBlock))
 
-        fragment, named_children = self.get_children_fragment(context)
-        for name, child in named_children:
-            children.append((name, child, ooyala_children[name]))
+    #     fragment, named_children = self.get_children_fragment(context)
+    #     for name, child in named_children:
+    #         children.append((name, child, ooyala_children[name]))
 
-        return (fragment, children)
+    #     return (fragment, children)
