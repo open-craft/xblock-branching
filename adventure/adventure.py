@@ -35,8 +35,7 @@ from xblock.completable import CompletableXBlockMixin
 from xblock.core import XBlock
 from xblock.fields import UNIQUE_ID, Integer, List, Scope, String
 
-from mentoring.light_children import XBlockWithLightChildren
-from mentoring.title import TitleBlock
+from problem_builder.mixins import EnumerableChildMixin
 from adventure.info import InfoBlock
 from adventure.step import StepBlock
 from adventure.utils import loader
@@ -108,11 +107,10 @@ DEFAULT_XML_CONTENT = textwrap.dedent("""\
 </adventure>
 """)
 
-# Classes ###########################################################
 
 @XBlock.needs('i18n')
 @XBlock.wants("settings")
-class AdventureBlock(CompletableXBlockMixin, XBlockWithLightChildren):
+class AdventureBlock(CompletableXBlockMixin, EnumerableChildMixin, XBlock):
     """
     An XBlock providing adventure capabilities
 
@@ -274,22 +272,20 @@ class AdventureBlock(CompletableXBlockMixin, XBlockWithLightChildren):
                     'html': step_fragment.content,
                     'has_choices': current_step.has_choices,
                     'student_choice': self._get_student_choice(current_step),
-                    'xblocks': [],
-                    # this should only be once in the app config...
-                    'is_studio': getattr(getattr(self, 'xmodule_runtime', None), 'is_author_mode', False)
+                    'xblocks': []
                 }
             }
 
-            ooyala_players = current_step.ooyala_players
-            for child in ooyala_players:
-                xblock = child.xblock_view()
-                xblock['data'] = {
+            video_blocks = current_step.video_blocks if hasattr(current_step, 'video_blocks') else []
+            for child in video_blocks:
+                xblock_view = child.student_view({})
+                xblock_view['data'] = {
                     'step': current_step.name,
                     'child': child.name
                 }
                 response['step']['xblocks'].append({
                     'id': child.name,
-                    'xblock': xblock
+                    'xblock': xblock_view
                 })
 
         return response
@@ -298,16 +294,6 @@ class AdventureBlock(CompletableXBlockMixin, XBlockWithLightChildren):
     def i18n_service(self):
         """ Obtains translation service """
         return self.runtime.service(self, "i18n")
-
-    @property
-    def title(self):
-        """
-        Returns the title child.
-        """
-        for child in self.get_children_objects():
-            if isinstance(child, TitleBlock):
-                return child
-        return None
 
     @property
     def info(self):
@@ -351,9 +337,7 @@ class AdventureBlock(CompletableXBlockMixin, XBlockWithLightChildren):
         if not self.current_step_name and self.has_steps:
             self.current_step_name = 'first'
 
-        info_fragment = None
-        if self.info:
-            info_fragment = self.info.render(context={'as_template': False})
+        info_fragment = self.info.render(context={'as_template': False}) if self.info else None
 
         fragment.add_content(loader.render_django_template(
             'templates/html/adventure.html', {
@@ -396,7 +380,7 @@ class AdventureBlock(CompletableXBlockMixin, XBlockWithLightChildren):
             self.adventure_id, self.current_step_name, submissions))
 
         current_step = self._get_current_step()
-        next_step_name = submissions['choice'] if 'choice' in submissions else None
+        next_step_name = submissions.get('choice', None)
         next_step = self._get_next_step(next_step_name)
 
         if not current_step or not next_step:

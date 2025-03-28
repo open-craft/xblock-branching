@@ -25,11 +25,14 @@
 
 import logging
 
-# from ooyala_player.ooyala_player import OoyalaPlayerLightChildBlock
+from xblock.core import XBlock
+from xblock.fields import String, Scope
+from web_fragments.fragment import Fragment
 
-from mentoring.light_children import LightChild, Scope, String
-from mentoring.mcq import MCQBlock
-from mentoring.step import StepParentMixin
+from xmodule.video_module.video_module import VideoBlock
+
+from problem_builder.mcq import MCQBlock
+from problem_builder.mixins import EnumerableChildMixin, StepParentMixin
 from adventure.utils import loader
 
 # Globals ###########################################################
@@ -39,7 +42,7 @@ log = logging.getLogger(__name__)
 # Classes ###########################################################
 
 
-class StepBlock(LightChild, StepParentMixin):
+class StepBlock(EnumerableChildMixin, StepParentMixin, XBlock):
     """
     A representation of an adventure step.
 
@@ -57,14 +60,26 @@ class StepBlock(LightChild, StepParentMixin):
         Returns a fragment containing the formatted step
         """
         context = context or {}
-        context['as_template'] = False
+        fragment = Fragment()
+        child_contents = []
 
-        fragment, children = self.get_step_fragment_children(context)
-        fragment.add_content(loader.render_template('templates/html/step.html', {
+        for child_id in self.children:
+            child = self.runtime.get_block(child_id)
+            if child is None:
+                child_contents.append("<p>[Error: Unable to load child component.]</p>")
+            else:
+                child_fragment = child.student_view(context)
+                fragment.add_fragment_resources(child_fragment)
+                child_contents.append(child_fragment.content)
+        
+        html = loader.render_template('templates/html/step.html', {
             'self': self,
-            'children': children
-        }))
-        return self.xblock_container.fragment_text_rewriting(fragment)
+            'children': child_contents
+        })
+        fragment.add_content(html)
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/adventure_step_view.js'))
+        fragment.initialize_js('StepBlock')
+        return fragment
 
     @property
     def has_choices(self):
@@ -76,26 +91,9 @@ class StepBlock(LightChild, StepParentMixin):
 
         return bool(choices)
 
-    # @property
-    # def ooyala_players(self):
-    #     """
-    #     Returns the ooyala players child.
-    #     """
-
-    #     ooyala_players = [child for child in self.get_children_objects()
-    #                       if isinstance(child, OoyalaPlayerLightChildBlock)]
-
-    #     return ooyala_players
-
-    # def get_step_fragment_children(self, context=None):
-    #     children = []
-
-    #     ooyala_children = {}
-    #     for child in self.get_children_objects():
-    #         ooyala_children[child.name] = bool(isinstance(child, OoyalaPlayerLightChildBlock))
-
-    #     fragment, named_children = self.get_children_fragment(context)
-    #     for name, child in named_children:
-    #         children.append((name, child, ooyala_children[name]))
-
-    #     return (fragment, children)
+    @property
+    def video_blocks(self):
+        """
+        Returns a list of child blocks that are instances of VideoBlock.
+        """
+        return [child for child in self.get_children_objects() if isinstance(child, VideoBlock)]

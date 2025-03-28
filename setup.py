@@ -24,7 +24,7 @@
 
 import os
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # Functions #########################################################
 
@@ -41,11 +41,11 @@ def package_data(pkg, root_list):
 
 setup(
     name='xblock-adventure',
-    version='1.0.1',
+    version='1.0.2',
     description='XBlock - Adventure (Modernized for Redwood)',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    packages=['adventure'],
+    packages=find_packages(),
     install_requires=[
         'XBlock>=1.6',
         'Django>=4.2,<5.0',
@@ -64,4 +64,5 @@ setup(
         'Framework :: Django :: 4.2',
         'Programming Language :: Python :: 3.11',
     ],
+    python_requires='>=3.8',
 )

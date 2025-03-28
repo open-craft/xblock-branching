@@ -25,7 +25,9 @@
 
 import logging
 
-from mentoring.light_children import LightChild, Scope, String
+from xblock.core import XBlock
+from xblock.fields import String, Scope
+from web_fragments.fragment import Fragment
 from adventure.utils import loader
 
 # Globals ###########################################################
@@ -35,7 +37,7 @@ log = logging.getLogger(__name__)
 # Classes ###########################################################
 
 
-class InfoBlock(LightChild):
+class InfoBlock(XBlock):
     """
     Info block for adventure description. It can contains html children.
     """
@@ -50,8 +52,9 @@ class InfoBlock(LightChild):
         context['as_template'] = False
 
         fragment, named_children = self.get_children_fragment(context)
-        fragment.add_content(loader.render_template('templates/html/info.html', {
+        html = loader.render_template('templates/html/info.html', {
             'self': self,
             'named_children': named_children,
-        }))
-        return self.xblock_container.fragment_text_rewriting(fragment)
+        })
+        fragment.add_content(html)
+        return fragment
