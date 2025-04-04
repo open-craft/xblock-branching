@@ -50,6 +50,7 @@ setup(
         'XBlock>=1.6',
         'Django>=4.2,<5.0',
         'xblock-problem-builder',
+        'video_xblock @ git+https://github.com/raccoongang/xblock-video.git@master#egg=video_xblock'
     ],
     entry_points={
         'xblock.v1': [

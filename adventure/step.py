@@ -29,11 +29,10 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope
 from web_fragments.fragment import Fragment
 
-from xmodule.video_module.video_module import VideoBlock
-
 from problem_builder.mcq import MCQBlock
 from problem_builder.mixins import EnumerableChildMixin, StepParentMixin
 from adventure.utils import loader
+from video_xblock import VideoXBlock
 
 # Globals ###########################################################
 
@@ -96,4 +95,4 @@ class StepBlock(EnumerableChildMixin, StepParentMixin, XBlock):
         """
         Returns a list of child blocks that are instances of VideoBlock.
         """
-        return [child for child in self.get_children_objects() if isinstance(child, VideoBlock)]
+        return [child for child in self.get_children_objects() if isinstance(child, VideoXBlock)]
