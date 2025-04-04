@@ -54,6 +54,9 @@ class StepBlock(EnumerableChildMixin, StepParentMixin, XBlock):
     next = String(help="Name of the next step", scope=Scope.content, default=None)
     has_children = True
 
+    def get_children_objects(self):
+        return [self.runtime.get_block(child_id) for child_id in self.children]
+
     def render(self, context=None):
         """
         Returns a fragment containing the formatted step

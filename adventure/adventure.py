@@ -128,6 +128,9 @@ class AdventureBlock(CompletableXBlockMixin, EnumerableChildMixin, XBlock):
     display_name = String(help="Display name of the component", default="Adventure",
                           scope=Scope.settings)
 
+    def get_children_objects(self):
+        return [self.runtime.get_block(child_id) for child_id in self.children]
+
     def _get_current_step(self):
         """
         Find the current step in the list with *current_step*.
