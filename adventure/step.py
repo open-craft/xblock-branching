@@ -27,6 +27,7 @@ import logging
 
 from xblock.core import XBlock
 from xblock.fields import String, Scope
+from xblockutils.studio_editable import StudioContainerWithNestedXBlocksMixin
 from web_fragments.fragment import Fragment
 
 from problem_builder.mcq import MCQBlock
@@ -41,7 +42,12 @@ log = logging.getLogger(__name__)
 # Classes ###########################################################
 
 
-class StepBlock(EnumerableChildMixin, StepParentMixin, XBlock):
+class StepBlock(
+    EnumerableChildMixin,
+    StepParentMixin,
+    StudioContainerWithNestedXBlocksMixin,
+    XBlock
+):
     """
     A representation of an adventure step.
 

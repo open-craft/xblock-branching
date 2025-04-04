@@ -34,6 +34,7 @@ from web_fragments.fragment import Fragment
 from xblock.completable import CompletableXBlockMixin
 from xblock.core import XBlock
 from xblock.fields import UNIQUE_ID, Integer, List, Scope, String
+from xblockutils.studio_editable import StudioContainerWithNestedXBlocksMixin
 
 from problem_builder.mixins import EnumerableChildMixin
 from adventure.info import InfoBlock
@@ -110,7 +111,12 @@ DEFAULT_XML_CONTENT = textwrap.dedent("""\
 
 @XBlock.needs('i18n')
 @XBlock.wants("settings")
-class AdventureBlock(CompletableXBlockMixin, EnumerableChildMixin, XBlock):
+class AdventureBlock(
+    CompletableXBlockMixin,
+    EnumerableChildMixin,
+    StudioContainerWithNestedXBlocksMixin,
+    XBlock
+):
     """
     An XBlock providing adventure capabilities
 
